@@ -1,0 +1,6 @@
+DATABASE:
+  USERNAME: "your_username" 
+  PASSWORD: "your_pass"
+  HOST: "localhost"
+  PORT: 5432
+  NAME: "sales_department"
