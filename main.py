@@ -1,41 +1,83 @@
-import psycopg2
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from models import Customer, Product, Purchase
+from schemas import (
+    CustomerSchema, 
+    ProductSchema, 
+    PurchaseSchema, 
+    CustomerCreate, 
+    ProductCreate, 
+    PurchaseCreate
+)
+from database import SessionLocal
 
-def database_exists(cursor, database_name):
-    cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s;", (database_name,))
-    return cursor.fetchone() is not None
-
-def create_database(database_name, user, password, host, port):
+def get_db():
+    db = SessionLocal()
     try:
-        connection = psycopg2.connect(
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-        )
-        connection.autocommit = True
+        yield db
+    finally:
+        db.close()
 
-        cursor = connection.cursor()
+app = FastAPI()
 
-        if not database_exists(cursor, database_name):
-            cursor.execute(f"CREATE DATABASE {database_name}")
-            print(f"Database '{database_name}' created successfully.")
+@app.get("/check_db_connection")
+async def check_db_connection(db: Session = Depends(get_db)):
+    try:
+        customer = db.query(Customer).first()
+
+        if customer:
+            return {"message": "Database connection successful!"}
         else:
-            print(f"Database '{database_name}' already exists. Skipping creation.")
+            return {"message": "No records found in the database."}
 
     except Exception as e:
-        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
 
-if __name__ == "__main__":
-    database_name = "sales_department"
-    user = "####"
-    password = "####"
-    host = "####"
-    port = "####"
+@app.post("/customers/", response_model=CustomerSchema)
+def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
+    # db_customer = Customer(**customer.dict())
+    db_customer = Customer(**customer.model_dump())
+    db.add(db_customer)
+    db.commit()
+    db.refresh(db_customer)
+    return db_customer
 
-    create_database(database_name, user, password, host, port)
+@app.get("/customers/{customer_id}", response_model=CustomerSchema)
+def read_customer(customer_id: int, db: Session = Depends(get_db)):
+    db_customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
+    if db_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return db_customer
+
+# CRUD operations for products
+@app.post("/products/", response_model=ProductSchema)
+def create_product(product: ProductCreate, db: Session = Depends(get_db)):
+    db_product = Product(**product.model_dump())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.get("/products/{product_id}", response_model=ProductSchema)
+def read_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+# CRUD operations for purchases
+@app.post("/purchases/", response_model=PurchaseSchema)
+def create_purchase(purchase: PurchaseCreate, db: Session = Depends(get_db)):
+    db_purchase = PurchaseSchema(**purchase.model_dump())
+    db.add(db_purchase)
+    db.commit()
+    db.refresh(db_purchase)
+    return db_purchase
+
+@app.get("/purchases/{purchase_id}", response_model=PurchaseSchema)
+def read_purchase(purchase_id: int, db: Session = Depends(get_db)):
+    db_purchase = db.query(Purchase).filter(Purchase.purchase_id == purchase_id).first()
+    if db_purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    return db_purchase
