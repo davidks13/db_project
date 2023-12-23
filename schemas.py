@@ -3,6 +3,7 @@ from datetime import date
 
 
 class CustomerSchema(BaseModel):
+    customer_id: int
     name: str
     address: str
     mobile_number: str
@@ -10,12 +11,14 @@ class CustomerSchema(BaseModel):
 
 
 class ProductSchema(BaseModel):
+    product_id: int
     product_name: str
     manufacturer: str
     units: str
 
 
 class PurchaseSchema(BaseModel):
+    purchase_id: int
     customer_id: int
     product_id: int
     quantity: int
