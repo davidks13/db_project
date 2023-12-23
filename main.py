@@ -69,7 +69,7 @@ def read_product(product_id: int, db: Session = Depends(get_db)):
 # CRUD operations for purchases
 @app.post("/purchases/", response_model=PurchaseSchema)
 def create_purchase(purchase: PurchaseCreate, db: Session = Depends(get_db)):
-    db_purchase = PurchaseSchema(**purchase.model_dump())
+    db_purchase = Purchase(**purchase.model_dump())
     db.add(db_purchase)
     db.commit()
     db.refresh(db_purchase)

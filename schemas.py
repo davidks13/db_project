@@ -1,8 +1,8 @@
 from pydantic import BaseModel
+from datetime import date
 
 
 class CustomerSchema(BaseModel):
-    id: int
     name: str
     address: str
     mobile_number: str
@@ -15,11 +15,10 @@ class ProductSchema(BaseModel):
 
 
 class PurchaseSchema(BaseModel):
-    id: int
     customer_id: int
     product_id: int
-    expected_delivery_date: str
     quantity: int
+    estimated_shipment_date: date
     price_per_unit: float
 
 
