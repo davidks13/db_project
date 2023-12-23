@@ -10,6 +10,7 @@ class CustomerSchema(BaseModel):
 
 
 class ProductSchema(BaseModel):
+    product_name: str
     manufacturer: str
     units: str
 
@@ -23,6 +24,7 @@ class PurchaseSchema(BaseModel):
 
 
 class ProductCreate(BaseModel):
+    product_name: str
     manufacturer: str
     units: str
 

@@ -5,18 +5,19 @@ from database import Base
 class Customer(Base):
     __tablename__ = 'customers'
     customer_id = Column(Integer, primary_key=True)
-    name = Column(String)
-    address = Column(String)
-    mobile_number = Column(String)
-    contact_person = Column(String)
+    name = Column(String(255), nullable=False)
+    address = Column(String(255), nullable=False)
+    mobile_number = Column(String(255), nullable=False)
+    contact_person = Column(String(255), nullable=False)
 
     purchases = relationship("Purchase", back_populates='customer')
 
 class Product(Base):
     __tablename__ = 'products'
     product_id = Column(Integer, primary_key=True)
-    manufacturer = Column(String)
-    units = Column(String)
+    product_name = Column(String(255), nullable=False)
+    manufacturer = Column(String(255), nullable=False)
+    units = Column(String(255), nullable=False)
 
     purchases = relationship("Purchase", back_populates='product')
 

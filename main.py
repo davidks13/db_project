@@ -81,3 +81,74 @@ def read_purchase(purchase_id: int, db: Session = Depends(get_db)):
     if db_purchase is None:
         raise HTTPException(status_code=404, detail="Purchase not found")
     return db_purchase
+
+@app.put("/customers/{customer_id}", response_model=CustomerSchema)
+def update_customer(customer_id: int, customer: CustomerCreate, db: Session = Depends(get_db)):
+    db_customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
+    if db_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    for key, value in customer.model_dump().items():
+        setattr(db_customer, key, value)
+
+    db.commit()
+    db.refresh(db_customer)
+    return db_customer
+
+@app.delete("/customers/{customer_id}", response_model=CustomerSchema)
+def delete_customer(customer_id: int, db: Session = Depends(get_db)):
+    db_customer = db.query(Customer).filter(Customer.customer_id == customer_id).first()
+    if db_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+
+    db.delete(db_customer)
+    db.commit()
+    return db_customer
+
+# CRUD operations for products
+@app.put("/products/{product_id}", response_model=ProductSchema)
+def update_product(product_id: int, product: ProductCreate, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    for key, value in product.model_dump().items():
+        setattr(db_product, key, value)
+
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+@app.delete("/products/{product_id}", response_model=ProductSchema)
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = db.query(Product).filter(Product.product_id == product_id).first()
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    db.delete(db_product)
+    db.commit()
+    return db_product
+
+# CRUD operations for purchases
+@app.put("/purchases/{purchase_id}", response_model=PurchaseSchema)
+def update_purchase(purchase_id: int, purchase: PurchaseCreate, db: Session = Depends(get_db)):
+    db_purchase = db.query(Purchase).filter(Purchase.purchase_id == purchase_id).first()
+    if db_purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+
+    for key, value in purchase.model_dump().items():
+        setattr(db_purchase, key, value)
+
+    db.commit()
+    db.refresh(db_purchase)
+    return db_purchase
+
+@app.delete("/purchases/{purchase_id}", response_model=PurchaseSchema)
+def delete_purchase(purchase_id: int, db: Session = Depends(get_db)):
+    db_purchase = db.query(Purchase).filter(Purchase.purchase_id == purchase_id).first()
+    if db_purchase is None:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+
+    db.delete(db_purchase)
+    db.commit()
+    return db_purchase
