@@ -28,6 +28,19 @@ def create_customer():
     return response.json()
 
 
+def create_customer_migration():
+    data = []
+    
+    for _ in range(100):
+        data.append({
+            "name": fake.name(),
+            "address": fake.address(),
+            "mobile_number": fake.phone_number(),
+            "contact_person": fake.name(),
+        })
+    return data
+
+
 def create_product():
     data = {
         "product_name": generate_fake_product_name(),
@@ -36,6 +49,18 @@ def create_product():
     }
     response = requests.post(f"{base_url}/products/", json=data)
     return response.json()
+
+
+def create_product_migration():
+    data = []
+    
+    for _ in range(100):
+        data.append({
+            "product_name": generate_fake_product_name(),
+            "manufacturer": fake.company(),
+            "units": generate_fake_unit()
+        })
+    return data
 
 
 def create_purchase():
@@ -53,9 +78,27 @@ def create_purchase():
     return response.json()
 
 
-for _ in range(100):
-    create_customer()
-    create_product()
 
-for _ in range(100):
-    create_purchase()
+def create_purchase_migration():
+    customer_id = random.randint(1, 100)
+    product_id = random.randint(1, 100)
+
+    data = []
+    for _ in range(100):
+        data.append({
+            "customer_id": customer_id,
+            "product_id": product_id,
+            "quantity": random.randint(1, 100),
+            "estimated_shipment_date": fake.date_this_decade().strftime("%Y-%m-%d"),
+            "price_per_unit": round(random.uniform(1.0, 100.0), 2),
+        })
+    return data
+
+
+if __name__ == 'main':
+    for _ in range(100):
+        create_customer()
+        create_product()
+
+    for _ in range(100):
+        create_purchase()

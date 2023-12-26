@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date
 from sqlalchemy.orm import relationship
 from database import Base
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Customer(Base):
     __tablename__ = 'customers'
@@ -19,6 +20,7 @@ class Product(Base):
     manufacturer = Column(String(255), nullable=False)
     units = Column(String(255), nullable=False)
 
+    json_data = Column(JSONB, nullable=True)
     purchases = relationship("Purchase", back_populates='product')
 
 class Purchase(Base):
